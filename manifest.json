@@ -1,10 +1,10 @@
 {
-	"id": "obsidian-auto-backlink",
-	"name": "Auto Backlink",
+	"id": "obsidian-mentions-in-status-bar",
+	"name": "Mentions in Status Bar",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "Automatically adds backlinks to the current notes so you can make your way back to the main MOC.",
+	"description": "Displays all the mentions of the current file in the status bar.",
 	"author": "Tobey Gronow",
-	"authorUrl": "https://obsidian.md",
-	"isDesktopOnly": false
+	"authorUrl": "https://twitter.com/JINC_Games",
+	"isDesktopOnly": true
 }
