@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-sample-plugin",
+	"name": "obsidian-auto-backlink",
 	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"description": "Automatically adds backlinks to the current notes so you can make your way back to the main MOC.",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
