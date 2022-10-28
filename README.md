@@ -7,4 +7,4 @@ Displays mentions to the current file in the status bar.
 This plugin supports the [Style Settings](https://github.com/mgmeyers/obsidian-style-settings) plugin. The maximum width of the mentions block can be changed with this plugin.
 
 ### Credits
-A portion of the [Auto MOC](https://github.com/dalcantara7/obsidian-auto-moc) is used. See main.ts for more.
+A portion of the [Auto MOC](https://github.com/dalcantara7/obsidian-auto-moc) plugin code is used. See main.ts for more.
