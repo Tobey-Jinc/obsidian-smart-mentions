@@ -1,15 +1,15 @@
 {
-	"name": "obsidian-auto-backlink",
+	"name": "obsidian-mentions-in-status-bar",
 	"version": "1.0.0",
-	"description": "Automatically adds backlinks to the current notes so you can make your way back to the main MOC.",
+	"description": "Displays all the mentions of the current file in the status bar.",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
 		"version": "node version-bump.mjs && git add manifest.json versions.json"
 	},
-	"keywords": [],
-	"author": "",
+	"keywords": ["Status Bar", "Mentions", "MOC"],
+	"author": "Tobey Gronow",
 	"license": "MIT",
 	"devDependencies": {
 		"@types/node": "^16.11.6",
