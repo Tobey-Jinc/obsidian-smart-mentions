@@ -1,6 +1,7 @@
 import { MarkdownView, Plugin } from 'obsidian';
 
 let mentions: HTMLElement | null = null;
+let hidden: boolean = true;
 
 export class LinkedMentions {
 	path: string;
@@ -75,6 +76,14 @@ export default class AB extends Plugin
 		return url;
 	}
 
+	sanitizeLink (link: String)
+	{
+		let sanitizedLink = link.replace(/^.*[\\\/]/, '');
+		sanitizedLink = sanitizedLink.replace(".md", '');
+
+		return sanitizedLink;
+	}
+
 	showLinks () {
 		/*
 			Puts all linked mentions in the status bar
@@ -95,18 +104,26 @@ export default class AB extends Plugin
 			}
 
 			// Add a status bar item with mentions class
-			mentions = this.addStatusBarItem();
-			mentions.classList.add("mentions");
+			// mentions = this.addStatusBarItem();
+			// mentions.classList.add("mentions");
+			mentions = view?.containerEl.createEl("div", { cls: "mentions" });
+			mentions.createEl("div", {cls: "mentions-background"});
 
 			// Only display mentions if necessary
 			if (linkedMentions.length > 0)
 			{
+				if (hidden)
+				{
+					mentions.addClass("mentions-reveal")
+					hidden = false;
+				}
+				else
+				{
+					mentions.addClass("mentions-revealed")
+				}
+
 				// Only display a maximum of 5 mentions
 				let length = linkedMentions.length;
-				if (length > 5)
-				{
-					length = 5;
-				}
 	
 				// Loop through each mention
 				for (let i = 0; i < length; i++)
@@ -115,27 +132,41 @@ export default class AB extends Plugin
 					let link = Object.values(linkedMentions[i])[0];
 	
 					// Remove all file information (folder/file.md --> file)
-					let sanitizedLink = link.replace(/^.*[\\\/]/, '');
-					sanitizedLink = sanitizedLink.replace(".md", '');
+					let sanitizedLink = this.sanitizeLink(link);
+
+					console.log(sanitizedLink);
 	
 					// Add the mention to the status bar
 					if (view?.file.name != sanitizedLink + ".md") // Don't add self to mention block
 					{
+
 						mentions.createEl("a", { text: sanitizedLink, href: this.pathToURL(link), cls: "mention" });
 
 						// Add a space as long as it isn't the final mention
 						if (i != length - 1)
 						{
-							mentions.createEl("span", { text: " / ", cls: "mention-space" });
-						}
-						else{
-							mentions.createEl("span", { text: "  |", cls: "mention-space" });
+							if (this.sanitizeLink(Object.values(linkedMentions[i + 1])[0]) + ".md" != view?.file.name)
+							{
+								// console.log("----------------");
+								// console.log(this.sanitizeLink(Object.values(linkedMentions[i + 1])[0]));
+								// console.log(sanitizedLink);
+								mentions.createEl("span", { text: " / ", cls: "mention-space" });
+							}
 						}
 					}
 				}
 			}
 			else // No mentions exist for this file
 			{
+				if (!hidden)
+				{
+					mentions.addClass("mentions-hide")
+					hidden = true;
+				}
+				else
+				{
+					mentions.addClass("mentions-hidden")
+				}
 				mentions.createEl("span", { text: "No Mentions", cls: "mention-title-muted" });
 			}
 		}

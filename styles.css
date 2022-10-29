@@ -31,9 +31,7 @@ settings:
 
 */
 
-.status-bar {
-    /* margin-bottom: 5px;
-    margin-right: 5px; */
+/* .status-bar {
     background: none;
     border: none;
     display: flex;
@@ -42,33 +40,91 @@ settings:
 .status-bar-item {
     color: rgb(105, 105, 105);
     order: 8;
+} */
+
+@keyframes hide-mentions {
+    from { bottom: 20px; }
+    to { bottom: -60px; }
+}
+
+@keyframes reveal-mentions {
+    from { bottom: -60px; }
+    to { bottom: 20px; }
 }
 
 .mentions {
-    background-color: #151515;
-    /* position: absolute;
-    bottom: 20px;
-    right: 2px; */
+    padding: 0px 3px;
+
+    position: fixed;
+    left: 50%;
+    bottom: -60px;
+    transform: translate(-50%, -50%);
+
+    /* position: absolute; */
+    /* bottom: 20px; */
+    /* right: 100%; */
     /* display: inline; */
     overflow-y: hidden;
     white-space: nowrap;
-    max-width: var(--ab-max-width);
-    order: 1;
+    max-width: 80%;
+    /* max-width: var(--ab-max-width); */
+    /* order: 1; */
 
+}
+
+.mentions-hidden {
+    bottom: -60px;
+}
+
+.mentions-hide {
+    bottom: -60px;
+
+    animation-name: hide-mentions;
+    animation-duration: 0.4s;
+}
+
+.mentions-revealed {
+    bottom: 20px;
+}
+
+.mentions-reveal {
+    bottom: 20px;
+
+    animation-name: reveal-mentions;
+    animation-duration: 0.4s;
+}
+
+.mentions-background {
+    position: absolute;
+    margin-top: 1px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(31, 31, 31, 0.6);
+    /* border-style: solid;
+    border-width: 1px; */
+    border-radius: 20px;
+    /* border-color: rgb(30, 30, 30); */
+    backdrop-filter: blur(5px);
+    z-index: -1;
+
+    transition-duration: 0.1s;
 }
 
 .mention, .mention-space, .mention-title-muted {
-    font-size: var(--ab-font-size);
+    font-size: 0.8em;
     text-decoration: none;
     color: var(--mention-color);
-    padding: 3px;
+    padding: 5px;
 }
 
 .mention:hover {
-    background-color: #212121;
-    border-radius: 5px;
+    /* background-color: #212121;
+    border-radius: 20px; */
     text-decoration: none;
-    color: var(--hover-color);
+    color: rgb(202, 202, 202);
+    /* color: var(--hover-color); */
 }
 
 .mention-space {
