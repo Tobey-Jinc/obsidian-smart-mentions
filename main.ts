@@ -1,4 +1,4 @@
-import { MarkdownView, Plugin, WorkspaceItem, WorkspaceLeaf } from 'obsidian';
+import { MarkdownView, Plugin } from 'obsidian';
 
 let mentions: HTMLElement | null = null;
 let hidden: boolean = true;
@@ -151,7 +151,7 @@ export default class AB extends Plugin
 					if (view?.file.name != sanitizedLink + ".md") // Don't add self to mention block
 					{
 						// let mention_container = mentions.createEl("span", { cls: "mention-container" });
-						mentions.createEl("a", { text: sanitizedLink, href: this.pathToURL(link), cls: "mention" });
+						mentions.createEl("a", { text: sanitizedLink, href: this.pathToURL(link), cls: "mention", attr: {"draggable": "false"} });
 						
 
 						// mentions.createEl("a", { text: sanitizedLink, attr: 
@@ -194,5 +194,13 @@ export default class AB extends Plugin
 				return this.showLinks();
 			}),
 		);
+	}
+
+	onunload()
+	{
+		if (mentions != null)
+		{
+			mentions.remove();
+		}
 	}
 }
