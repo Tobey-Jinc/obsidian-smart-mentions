@@ -9,7 +9,7 @@ Smart Mentions is an alternative to Obsidians default linked mentions view. Ment
 ![image](https://user-images.githubusercontent.com/36495056/198856788-2d0917d0-0e32-43db-8c7b-15421c2a4910.png)
 
 ### Style Settings Support
-This plugin supports the [Style Settings](https://github.com/mgmeyers/obsidian-style-settings) plugin. The maximum width of the mentions block can be changed with this plugin.
+This plugin supports the [Style Settings](https://github.com/mgmeyers/obsidian-style-settings) plugin.
 
 ### Credits
 A portion of the [Auto MOC](https://github.com/dalcantara7/obsidian-auto-moc) plugin code is used. See main.ts for more.
