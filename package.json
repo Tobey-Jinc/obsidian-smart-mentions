@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-mentions-in-status-bar",
+	"name": "obsidian-smart-mentions",
 	"version": "1.0.0",
-	"description": "Displays all the mentions of the current file in the status bar.",
+	"description": "Shows all mentions at the bottom of the note.",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",

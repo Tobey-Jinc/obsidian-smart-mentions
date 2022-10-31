@@ -1,6 +1,6 @@
 {
-	"id": "obsidian-mentions-in-status-bar",
-	"name": "Mentions in Status Bar",
+	"id": "obsidian-smart-mentions",
+	"name": "Smart Mentions",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
 	"description": "Displays all the mentions of the current file in the status bar.",
