@@ -1,4 +1,4 @@
-import { MarkdownView, Plugin } from 'obsidian';
+import { MarkdownView, Plugin, WorkspaceItem, WorkspaceLeaf } from 'obsidian';
 
 let mentions: HTMLElement | null = null;
 let hidden: boolean = true;
@@ -109,8 +109,19 @@ export default class AB extends Plugin
 			mentions = view?.containerEl.createEl("div", { cls: "mentions" });
 			mentions.createEl("div", {cls: "mentions-background"});
 
+			let onlyFileIsValid;
+
+			if (linkedMentions.length == 1 )
+			{
+				onlyFileIsValid = (this.sanitizeLink(Object.values(linkedMentions[0])[0]) + ".md" != view?.file.name)
+			}
+			else
+			{
+				onlyFileIsValid = true;
+			}
+
 			// Only display mentions if necessary
-			if (linkedMentions.length > 0)
+			if (linkedMentions.length > 0 && onlyFileIsValid)
 			{
 				if (hidden)
 				{
@@ -139,17 +150,19 @@ export default class AB extends Plugin
 					// Add the mention to the status bar
 					if (view?.file.name != sanitizedLink + ".md") // Don't add self to mention block
 					{
-
+						// let mention_container = mentions.createEl("span", { cls: "mention-container" });
 						mentions.createEl("a", { text: sanitizedLink, href: this.pathToURL(link), cls: "mention" });
+						
+
+						// mentions.createEl("a", { text: sanitizedLink, attr: 
+						// 	{"data-href": link.replace(".md", ""), "target": "_blank", "rel": "noopener"}, 
+						// 	href: link.replace(".md", ""), cls: "mention internal-link" });
 
 						// Add a space as long as it isn't the final mention
 						if (i != length - 1)
 						{
 							if (this.sanitizeLink(Object.values(linkedMentions[i + 1])[0]) + ".md" != view?.file.name)
 							{
-								// console.log("----------------");
-								// console.log(this.sanitizeLink(Object.values(linkedMentions[i + 1])[0]));
-								// console.log(sanitizedLink);
 								mentions.createEl("span", { text: " / ", cls: "mention-space" });
 							}
 						}

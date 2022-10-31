@@ -1,33 +1,50 @@
 /* @settings
 name: Mentions in Status Bar
-id: ab-style
+id: sm-style
 settings:
     - 
-        id: ab-max-width
-        title: Maximum width
-        description: The maximum width of the block before it has be scrolled.
-        type: variable-number
-        default: 300
-        format: px
-
-    - 
-        id: ab-font-size
+        id: sm-font-size
         title: Font Size
         type: variable-number
-        default: 1
+        default: 0.8
         format: em
+    - 
+        id: sm-bottom-float
+        title: Distance from Bottom
+        type: variable-number
+        default: 20
+        format: px
+    - 
+        id: sm-background-blur
+        title: Background Blur
+        type: variable-number
+        default: 5
+        format: px
     -
-        id: mention-color
+        id: sm-background-color
+        title: Background Color
+        type: variable-color
+        opacity: true
+        format: hex
+        default: '#1B1B1BC2'
+    -
+        id: sm-mention-color
         title: Mention Color
         type: variable-color
         format: hex
-        default: '#fff'
+        default: '#c0c0c0'
     -
-        id: hover-color
+        id: sm-hover-color
         title: Hover Color
         type: variable-color
         format: hex
-        default: '#fff'
+        default: '#ececec'
+    -
+        id: sm-space-color
+        title: Space Color
+        type: variable-color
+        format: hex
+        default: '#4d4d4d'
 
 */
 
@@ -42,34 +59,37 @@ settings:
     order: 8;
 } */
 
+:root {
+    --sm-font-size: 0.8em;
+    --sm-bottom-float: 20px;
+    --sm-background-blur: 5px;
+
+    --sm-background-color: #1B1B1BC2;
+    --sm-mention-color: #c0c0c0;
+    --sm-hover-color: #ececec;
+    --sm-space-color: #4d4d4d;
+}
+
 @keyframes hide-mentions {
-    from { bottom: 20px; }
+    from { bottom: var(--sm-bottom-float); }
     to { bottom: -60px; }
 }
 
 @keyframes reveal-mentions {
     from { bottom: -60px; }
-    to { bottom: 20px; }
+    to { bottom: var(--sm-bottom-float); }
 }
 
 .mentions {
-    padding: 0px 3px;
-
+    padding: 0px 4px;
     position: fixed;
     left: 50%;
     bottom: -60px;
     transform: translate(-50%, -50%);
-
-    /* position: absolute; */
-    /* bottom: 20px; */
-    /* right: 100%; */
-    /* display: inline; */
     overflow-y: hidden;
     white-space: nowrap;
     max-width: 80%;
-    /* max-width: var(--ab-max-width); */
-    /* order: 1; */
-
+    pointer-events: none;
 }
 
 .mentions-hidden {
@@ -84,11 +104,11 @@ settings:
 }
 
 .mentions-revealed {
-    bottom: 20px;
+    bottom:var(--sm-bottom-float);
 }
 
 .mentions-reveal {
-    bottom: 20px;
+    bottom: var(--sm-bottom-float);
 
     animation-name: reveal-mentions;
     animation-duration: 0.4s;
@@ -101,35 +121,52 @@ settings:
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(31, 31, 31, 0.6);
-    /* border-style: solid;
-    border-width: 1px; */
+    background-color: var(--sm-background-color);
     border-radius: 20px;
-    /* border-color: rgb(30, 30, 30); */
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(var(--sm-background-blur));
     z-index: -1;
-
-    transition-duration: 0.1s;
 }
 
 .mention, .mention-space, .mention-title-muted {
-    font-size: 0.8em;
+    font-size: var(--sm-font-size);
     text-decoration: none;
-    color: var(--mention-color);
+    color: var(--sm-mention-color);
     padding: 5px;
-}
-
-.mention:hover {
-    /* background-color: #212121;
-    border-radius: 20px; */
-    text-decoration: none;
-    color: rgb(202, 202, 202);
-    /* color: var(--hover-color); */
+    transition-duration: 0.3s;
 }
 
 .mention-space {
     white-space: pre;
-    color: rgb(80, 80, 80);
+    color: var(--sm-space-color);
+}
+
+.mentions > .mention {
+    pointer-events: auto;
+}
+
+.mentions:hover > .mention {
+    text-decoration: none;
+    color: var(--sm-space-color);
+}
+
+.mentions:hover > .mention:hover {
+    text-decoration: none;
+    color: var(--sm-hover-color);
+}
+
+/* .mention:hover {
+    text-decoration: none;
+    color: var(--sm-hover-color);
+} */
+
+/* .mentions:hover .mention:not(:hover) {
+    text-decoration: none;
+    color: var(--sm-mention-color);
+    filter: brightness(70%);
+} */
+
+.mention-space:hover .mention {
+    color: red;
 }
 
 .mention-title-muted {
