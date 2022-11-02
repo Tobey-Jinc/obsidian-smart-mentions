@@ -141,7 +141,10 @@ export default class AB extends Plugin
 
 				// Only display a maximum of 5 mentions
 				let length = linkedMentions.length;
-	
+				
+				console.log("---------------------");
+				console.log(cameFrom);
+
 				// Loop through each mention
 				for (let i = 0; i < length; i++)
 				{
@@ -166,13 +169,16 @@ export default class AB extends Plugin
 						else
 						{
 							// Add link
-							if (sanitizedLink == cameFrom.replace(".md", "")) { sanitizedLink = "🡨 " + sanitizedLink }
+							if (link == cameFrom) { sanitizedLink = "🡨 " + sanitizedLink }
 							mentions.createEl("a", { text: sanitizedLink, href: this.pathToURL(link), cls: "mention", attr: {"draggable": "false"} });
 
 							// Add space
 							if (i != length - 1 || leftOvers.length > 0)
 							{
-								mentions.createEl("span", { text: " / ", cls: "mention-space" });
+								if (view?.file.name != this.sanitizeLink(Object.values(linkedMentions[i + 1])[0]) + ".md")
+								{
+									mentions.createEl("span", { text: " / ", cls: "mention-space" });
+								}
 							}
 						}
 
@@ -191,7 +197,7 @@ export default class AB extends Plugin
 					for (let i = 0; i < leftOvers.length; i++)
 					{
 						let sanitizedLink = this.sanitizeLink(leftOvers[i]);
-						if (sanitizedLink == cameFrom.replace(".md", "")) { sanitizedLink = "🡨 " + sanitizedLink }
+						if (leftOvers[i] == cameFrom) { sanitizedLink = "🡨 " + sanitizedLink }
 						extra_menu_item_container.createEl("a", { text: sanitizedLink, href: this.pathToURL(leftOvers[i]), cls: "mention-extra-menu-item", attr: {"draggable": "false"} });
 						extra_menu_item_container.createEl("br");
 					};
