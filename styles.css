@@ -49,76 +49,30 @@ settings:
 */
 
 :root {
+    /* Numerical variables */
     --sm-font-size: 0.8em;
     --sm-bottom-float: 20px;
     --sm-background-blur: 5px;
 
+    /* Colour variables */
     --sm-background-color: #1B1B1BC2;
     --sm-mention-color: #c0c0c0;
     --sm-hover-color: #ececec;
     --sm-space-color: #4d4d4d;
 }
 
-body {
-    z-index: 2;
-}
-
-@keyframes hide-mentions {
-    from { bottom: var(--sm-bottom-float); }
-    to { bottom: -60px; }
-}
-
-@keyframes reveal-mentions {
-    from { bottom: -60px; }
-    to { bottom: var(--sm-bottom-float); }
-}
-
+/* The main container */
 .mentions {
     padding: 0px 4px;
     position: fixed;
     left: 50%;
-    bottom: -60px;
+    bottom:var(--sm-bottom-float);
     transform: translate(-50%, -50%);
     display: inline-block;
-    /* word-break: break-all; */
-    /* hyphens: manual; */
     white-space: nowrap;
-    /* inline-size: min-content; */
-    /* text-align: center; */
-    /* width: 98%; */
 }
 
-.mentions-hidden {
-    bottom: -60px;
-}
-
-.mentions-hide {
-    bottom: -60px;
-
-    animation-name: hide-mentions;
-    animation-duration: 0.4s;
-}
-
-.mentions-revealed {
-    bottom:var(--sm-bottom-float);
-}
-
-.mentions-reveal {
-    bottom: var(--sm-bottom-float);
-
-    animation-name: reveal-mentions;
-    animation-duration: 0.4s;
-}
-
-/* .mentions-container {
-    position: absolute;
-    margin-top: 1px;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-} */
-
+/* Background for the main bar */
 .mentions-background {
     position: absolute;
     margin-top: 1px;
@@ -132,39 +86,34 @@ body {
     z-index: -1;
 }
 
+/* Style for links in main bar */
 .mention, .mention-space, .mention-title-muted {
     font-size: var(--sm-font-size);
     text-decoration: none;
     color: var(--sm-mention-color);
     padding: 5px;
     transition-duration: 0.3s;
-    /* display: inline-block; */
 }
 
+/* The space (" / ") between links */
 .mention-space {
     white-space: pre;
     color: var(--sm-space-color);
 }
 
+/* Hover link */
 .mention:hover {
     text-decoration: none;
     color: var(--sm-hover-color);
 }
 
-.mention-space:hover .mention {
-    color: red;
-}
-
-.mention-title-muted {
-    white-space: pre;
-    color: rgb(105, 105, 105);
-}
-
-#mention-extra-button {
+/* The checkbox that shows / hides the overflow menu */
+#show-overflow-menu-checkbox {
     display: none;
 }
 
-.mention-extra-menu {
+/* Container for overflow menu */
+.overflow-menu {
     display: none;
     pointer-events: auto;
     position: absolute;
@@ -174,11 +123,13 @@ body {
     width: 100%;
 }
 
-#mention-extra-button:checked ~ .mention-extra-menu {
+/* Show menu if the box is checked */
+#show-overflow-menu-checkbox:checked ~ .overflow-menu {
     display: initial;
 }
 
-.mention-extra-menu-background {
+/* Background for overflow menu */
+.overflow-menu-background {
     position: absolute;
     margin-top: 1px;
     top: 0;
@@ -193,14 +144,17 @@ body {
     border-radius: 10px;
 }
 
-.mention-extra-menu-item-container {
+/* Container of the overflow menu items */
+/* Used to stop the backgroun (overflow-menu-background) from scrolling with the items */
+.overflow-menu-item-container {
     padding: 0px 8px;
     border-radius: 10px;
     max-height: 200px;
     overflow-y: auto;
 }
 
-.mention-extra-menu-item {
+/* The items in the overflow menu */
+.overflow-menu-item {
     font-size: var(--sm-font-size);
     text-decoration: none;
     color: var(--sm-mention-color);
@@ -210,17 +164,19 @@ body {
     white-space: normal;
 }
 
-.mention-extra-menu-item:hover {
+.overflow-menu-item:hover {
     text-decoration: none;
     color: var(--sm-hover-color);
 }
 
-.mention-open-extra-menu {
+/* The open overflow menu button */
+.overflow-menu-label-button {
     display: inline-block;
     transform: scale(2, 2) translate(-1px, -1.5px);
     transition-duration: 0.2s;
 }
 
-#mention-extra-button:checked ~ .mention-open-extra-menu {
+/* Rotate + when open */
+#show-overflow-menu-checkbox:checked ~ .overflow-menu-label-button {
     transform: rotate(45deg) scale(2, 2) translate(0px, -1px);
 }
