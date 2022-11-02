@@ -1,6 +1,9 @@
+import { link } from 'fs';
 import { MarkdownView, Plugin } from 'obsidian';
 
 let mentions: HTMLElement | null = null;
+let cameFromEl: HTMLElement | null = null;
+let cameFrom: string = "";
 let hidden: boolean = true;
 
 export class LinkedMentions {
@@ -16,41 +19,17 @@ export default class AB extends Plugin
 			This method is taken from https://github.com/dalcantara7/obsidian-auto-moc
 		*/
 		const allFiles = this.app.metadataCache.resolvedLinks;
-		// console.log(Object.keys(allFiles));
 
 		let linkedMentions : LinkedMentions[] = [];
 		Object.keys(allFiles).forEach((key) => {
 			if (currFilePath in allFiles[key])
 			{
-				// console.log(Object.keys(allFiles[key]).length);
 				linkedMentions.push({path: key, links: Object.keys(allFiles[key]).length});
 			}
 		});
 
 		linkedMentions = linkedMentions.sort((a,b) => b.links - a.links);
-		console.log(linkedMentions);
-		console.log("=====================================");
 
-		return linkedMentions.sort();
-	}
-
-	getNumberOfLinks(currFilePath: string)
-	{
-		/*
-			This method is taken from https://github.com/dalcantara7/obsidian-auto-moc
-		*/
-		const allFiles = this.app.metadataCache.resolvedLinks;
-		
-		let linkedMentions: Array<string> = [];
-		Object.keys(allFiles).forEach((key) => {
-			if (currFilePath in allFiles[key])
-			{
-				linkedMentions.push(key);
-			}
-		});
-
-
-		
 		return linkedMentions.sort();
 	}
 
@@ -84,6 +63,24 @@ export default class AB extends Plugin
 		return sanitizedLink;
 	}
 
+	addLink (links: Array<object>, linkToAdd: string) {
+		let duplicate = false
+
+		links.forEach(link => {
+			if (Object.values(link)[0] == linkToAdd)
+			{
+				duplicate = false;
+			}
+		});
+
+		if (!duplicate)
+		{
+			links.unshift({path: linkToAdd, links: 1});
+		}
+
+		return links;
+	}
+
 	showLinks () {
 		/*
 			Puts all linked mentions in the status bar
@@ -97,17 +94,33 @@ export default class AB extends Plugin
 			// Get linked mentions
 			let linkedMentions = this.getLinkedMentions(view.file.path);
 
-			// Clear the shown mentions from the previous file if necessary
-			if (mentions != null)
+			if (cameFrom != "")
 			{
-				mentions.remove();
+				let duplicate = false
+
+				linkedMentions.forEach(link => {
+					if (Object.values(link)[0] == cameFrom)
+					{
+						duplicate = true;
+					}
+				});
+	
+				if (!duplicate)
+				{
+					linkedMentions = linkedMentions.concat({path: cameFrom, links: 1});
+				}
+	
+				// Clear the shown mentions from the previous file if necessary
+				if (mentions != null)
+				{
+					mentions.remove();
+				}
 			}
 
 			// Add a status bar item with mentions class
-			// mentions = this.addStatusBarItem();
-			// mentions.classList.add("mentions");
 			mentions = view?.containerEl.createEl("div", { cls: "mentions" });
 			mentions.createEl("div", {cls: "mentions-background"});
+			mentions.addClass("mentions-revealed")
 
 			let onlyFileIsValid;
 
@@ -123,15 +136,8 @@ export default class AB extends Plugin
 			// Only display mentions if necessary
 			if (linkedMentions.length > 0 && onlyFileIsValid)
 			{
-				if (hidden)
-				{
-					mentions.addClass("mentions-reveal")
-					hidden = false;
-				}
-				else
-				{
-					mentions.addClass("mentions-revealed")
-				}
+				let totalCharacters = 0;
+				let leftOvers: Array<string> = [];
 
 				// Only display a maximum of 5 mentions
 				let length = linkedMentions.length;
@@ -141,47 +147,58 @@ export default class AB extends Plugin
 				{
 					// Get mention
 					let link = Object.values(linkedMentions[i])[0];
+
+					if (link == cameFrom && cameFromEl != null)
+					{
+						cameFromEl.remove();
+					}
 	
 					// Remove all file information (folder/file.md --> file)
 					let sanitizedLink = this.sanitizeLink(link);
-
-					console.log(sanitizedLink);
 	
 					// Add the mention to the status bar
 					if (view?.file.name != sanitizedLink + ".md") // Don't add self to mention block
 					{
-						// let mention_container = mentions.createEl("span", { cls: "mention-container" });
-						mentions.createEl("a", { text: sanitizedLink, href: this.pathToURL(link), cls: "mention", attr: {"draggable": "false"} });
-						
-
-						// mentions.createEl("a", { text: sanitizedLink, attr: 
-						// 	{"data-href": link.replace(".md", ""), "target": "_blank", "rel": "noopener"}, 
-						// 	href: link.replace(".md", ""), cls: "mention internal-link" });
-
-						// Add a space as long as it isn't the final mention
-						if (i != length - 1)
+						if (totalCharacters > 30)
 						{
-							if (this.sanitizeLink(Object.values(linkedMentions[i + 1])[0]) + ".md" != view?.file.name)
+							leftOvers = leftOvers.concat(link);
+						}
+						else
+						{
+							// Add link
+							if (sanitizedLink == cameFrom.replace(".md", "")) { sanitizedLink = "🡨 " + sanitizedLink }
+							mentions.createEl("a", { text: sanitizedLink, href: this.pathToURL(link), cls: "mention", attr: {"draggable": "false"} });
+
+							// Add space
+							if (i != length - 1 || leftOvers.length > 0)
 							{
 								mentions.createEl("span", { text: " / ", cls: "mention-space" });
 							}
 						}
+
+						totalCharacters += sanitizedLink.length;
 					}
 				}
-			}
-			else // No mentions exist for this file
-			{
-				if (!hidden)
+
+				if (leftOvers.length > 0)
 				{
-					mentions.addClass("mentions-hide")
-					hidden = true;
+					mentions.createEl("input", { type: "checkbox", cls: "mention", attr: {"draggable": "false", "id": "mention-extra-button"} });
+					mentions.createEl("label", { text: "+", cls: "mention mention-open-extra-menu", attr: {"draggable": "false", "for": "mention-extra-button"} });
+					let extra_menu = mentions.createEl("div", {cls: "mention-extra-menu"});
+					extra_menu.createEl("div", {cls: "mention-extra-menu-background"});
+					let extra_menu_item_container = extra_menu.createEl("div", {cls: "mention-extra-menu-item-container"});
+
+					for (let i = 0; i < leftOvers.length; i++)
+					{
+						let sanitizedLink = this.sanitizeLink(leftOvers[i]);
+						if (sanitizedLink == cameFrom.replace(".md", "")) { sanitizedLink = "🡨 " + sanitizedLink }
+						extra_menu_item_container.createEl("a", { text: sanitizedLink, href: this.pathToURL(leftOvers[i]), cls: "mention-extra-menu-item", attr: {"draggable": "false"} });
+						extra_menu_item_container.createEl("br");
+					};
 				}
-				else
-				{
-					mentions.addClass("mentions-hidden")
-				}
-				mentions.createEl("span", { text: "No Mentions", cls: "mention-title-muted" });
 			}
+
+			cameFrom = view.file.path;
 		}
 	}
 
