@@ -8,8 +8,9 @@ Smart Mentions is an alternative to Obsidians default linked mentions view. Ment
 - Excess mentions are put into a collapsible menu.
 - Customisable using the Style Settings plugin (see below).
 
-![image](https://user-images.githubusercontent.com/36495056/198856712-31e616d8-6684-449e-bf3c-792b9b09b40c.png)
-![image](https://user-images.githubusercontent.com/36495056/198856788-2d0917d0-0e32-43db-8c7b-15421c2a4910.png)
+![image](https://user-images.githubusercontent.com/36495056/199388755-0544390d-2f51-4339-a66c-872d952bf774.png)
+![image](https://user-images.githubusercontent.com/36495056/199388968-567c1b93-2d2c-409c-a7bc-19db342c97a6.png)
+![image](https://user-images.githubusercontent.com/36495056/199388999-ec72ff1e-5f38-4994-8ca5-448efb006b10.png)
 
 ### Style Settings Support
 This plugin supports the [Style Settings](https://github.com/mgmeyers/obsidian-style-settings) plugin.
