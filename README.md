@@ -9,7 +9,9 @@ Smart Mentions is an alternative to Obsidians default linked mentions view. Ment
 - Customisable using the Style Settings plugin (see below).
 
 ![image](https://user-images.githubusercontent.com/36495056/199388755-0544390d-2f51-4339-a66c-872d952bf774.png)
+
 ![image](https://user-images.githubusercontent.com/36495056/199388968-567c1b93-2d2c-409c-a7bc-19db342c97a6.png)
+
 ![image](https://user-images.githubusercontent.com/36495056/199388999-ec72ff1e-5f38-4994-8ca5-448efb006b10.png)
 
 ### Style Settings Support
