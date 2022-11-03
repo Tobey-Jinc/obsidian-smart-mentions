@@ -1,9 +1,9 @@
 {
 	"id": "obsidian-smart-mentions",
 	"name": "Smart Mentions",
-	"version": "1.0.0",
-	"minAppVersion": "0.15.0",
-	"description": "Displays all the mentions of the current file in the status bar.",
+	"version": "2.0.1",
+	"minAppVersion": "1.0.0",
+	"description": "An Obsidian.md plugin that displays the mentions to the current file.",
 	"author": "Tobey Gronow",
 	"authorUrl": "https://twitter.com/JINC_Games",
 	"isDesktopOnly": true
