@@ -213,6 +213,10 @@ export default class SmartMentions extends Plugin
 
 			cameFrom = view.file.path;
 		}
+		else
+		{
+			cameFrom = "";
+		}
 	}
 
 	async onload()
