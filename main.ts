@@ -10,7 +10,7 @@ export class LinkedMentions {
 	links: number;	// Total number of links this note contains
 }
 
-export default class AB extends Plugin
+export default class SmartMentions extends Plugin
 {
 	/**
 	 * Gets all the mentions of the active note and sorts them by how many links they contain
