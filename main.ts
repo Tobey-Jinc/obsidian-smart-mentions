@@ -91,6 +91,26 @@ export default class SmartMentions extends Plugin
 	}
 
 	/**
+	 * Updates the came from link
+	 * 
+	 * @remarks This is triggered when a file is renamed to make sure the came from mention is up to date and prevents broken links
+	 */
+	updateCameFrom()
+	{
+		// Get current file
+		const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+
+		if (view != null && view.file.extension === "md")
+		{
+			cameFrom = view.file.path;
+		}
+		else
+		{
+			cameFrom = "";
+		}
+	}
+
+	/**
 	 * The brains of the plugin. Adds all mentions to a bar at the bottom center of the current note.
 	 */
 	showLinks () {
@@ -226,6 +246,14 @@ export default class SmartMentions extends Plugin
 		this.app.workspace.on('file-open', () => 
 			{
 				return this.showLinks();
+			}),
+		);
+
+		// Update cameFrom when a file is renamed
+		this.registerEvent(
+		this.app.vault.on('rename', () => 
+			{
+				return this.updateCameFrom();
 			}),
 		);
 	}
