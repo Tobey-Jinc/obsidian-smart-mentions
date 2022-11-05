@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-smart-mentions",
-	"version": "1.0.0",
+	"version": "2.0.2",
 	"description": "Shows all mentions at the bottom of the note.",
 	"main": "main.js",
 	"scripts": {
@@ -8,7 +8,7 @@
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
 		"version": "node version-bump.mjs && git add manifest.json versions.json"
 	},
-	"keywords": ["Status Bar", "Mentions", "MOC"],
+	"keywords": ["Mentions", "MOC"],
 	"author": "Tobey Gronow",
 	"license": "MIT",
 	"devDependencies": {
