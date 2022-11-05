@@ -1,17 +1,35 @@
 import { MarkdownView, Plugin } from 'obsidian';
+import { SmartMentionsSettingsTab } from "./settings";
 
 let mentions: HTMLElement | null = null;	// The div that contains the mentions bar
 let cameFrom: string = "";					// The path of the previous note
 
-const MAX_CHARACTERS: number = 30;			// Max amount of character before mentions are added to overflow menu
+const MAX_CHARACTERS: number = 36;			// Max amount of character before mentions are added to overflow menu
 
 export class LinkedMentions {
 	path: string; 	// Path of mentions
 	links: number;	// Total number of links this note contains
 }
 
+interface SmartMentionsSettings
+{
+	hideFrontUnderScore: boolean;		// Should underscores at start of name be hidden (_home become home)
+	useFolderNotes: boolean;			// Does this vault use folder notes / should folder notes attempt to be found
+		minimumNumberOfLinks: number;	// The minimum number of links a note can have for to be considered a potential folder note
+		rootFolderNote: string;			// Since root does have a name, a folder note name must be manually set
+}
+
+const DEFAULT_SETTINGS: Partial<SmartMentionsSettings> = {
+	hideFrontUnderScore: true,
+	useFolderNotes: true,
+		minimumNumberOfLinks: 5,
+		rootFolderNote: "_Home",
+}
+
 export default class SmartMentions extends Plugin
 {
+	settings: SmartMentionsSettings;
+
 	/**
 	 * Gets all the mentions of the active note and sorts them by how many links they contain
 	 * 
@@ -23,7 +41,6 @@ export default class SmartMentions extends Plugin
 	 */
 	getLinkedMentions(currFilePath: string)
 	{
-
 		// Get all files
 		const allFiles = this.app.metadataCache.resolvedLinks;
 
@@ -44,6 +61,88 @@ export default class SmartMentions extends Plugin
 		linkedMentions = linkedMentions.sort((a,b) => b.links - a.links);
 
 		return linkedMentions;
+	}
+
+	/**
+	 * Tries to determine the folder note
+	 * 
+	 * @remarks If a note has the same name as the folder, the that is returned. Otherwise, the note with the most links is chosen (assuming it has more than the minimum)
+	 * 
+	 * @param currFilePath 
+	 * @returns The folder note
+	 */
+	findFolderNote(currFilePath: string)
+	{
+		if (this.settings.useFolderNotes)
+		{
+			// Get all files
+			const allFiles = this.app.metadataCache.resolvedLinks;
+
+			let fileImportanceList : LinkedMentions[] = [];
+
+			// Get the folders of the current note (folder/folder/note.md becomes folder/folder)
+			let currFolderDir = currFilePath.substring(0, currFilePath.lastIndexOf("/"));
+
+			let folderNote = "";
+
+			// Loop through each file
+			Object.keys(allFiles).forEach((key) => {
+				// Find the lowest folder name (a/b/note.md becomes b)
+				let folders = key.split("/");
+				let folderNoteName = folders[folders.length - 2]
+				if (folderNoteName == undefined)
+				{
+					folderNoteName = this.settings.rootFolderNote;
+				}
+
+				// Find the folders of the this note (folder/folder/note.md becomes folder/folder)
+				let folderDir = key.substring(0, key.lastIndexOf("/"));
+
+				// Check if the note is contained in the active notes folder
+				if (folderDir == currFolderDir)
+				{
+					// Check if the file is the true folder note
+					if (folderNoteName == this.sanitizeLink(key))
+					{
+						folderNote = key;
+						return folderNote; // return because all of notes are now redundant
+					}
+
+					fileImportanceList.push({path: key, links: Object.keys(allFiles[key]).length});
+				}
+			});
+
+			// If a folder note has not been found
+			if (folderNote == "")
+			{
+				// Sort by number of links
+				fileImportanceList = fileImportanceList.sort((a,b) => b.links - a.links);
+
+				// Check if the first note contains enough links
+				if (Object.values(fileImportanceList[0])[1] >= this.settings.minimumNumberOfLinks)
+				{
+					// * Make sure the first and second file don't have the same amount of links
+					let matched = false;
+					if (fileImportanceList.length > 1)
+					{
+						if (Object.values(fileImportanceList[0])[1] == Object.values(fileImportanceList[1])[1])
+						{
+							matched = true; // At this point, no folder note exists
+						}
+					}
+
+					if (!matched)
+					{
+						// Then, Assume the note with the largest number of links is the folder note (or equivalent)
+						folderNote = Object.values(fileImportanceList[0])[0];
+					}
+				}
+			}
+
+			return folderNote;
+		}
+
+		return "";
 	}
 
 	/**
@@ -123,10 +222,18 @@ export default class SmartMentions extends Plugin
 			// Get linked mentions
 			let linkedMentions = this.getLinkedMentions(view.file.path);
 
+			// Get folder note
+			let folderNote = this.findFolderNote(view.file.path);
+
+			if (folderNote != "")
+			{
+				// Add folder note to FRONT of mentions
+				linkedMentions.unshift({path: folderNote, links: 1});
+			}
+
 			if (cameFrom != "")
 			{
 				// If the the previous link isn't in the mentions, then add it
-
 				let duplicate = false;
 
 				// Loop through mentions
@@ -173,18 +280,30 @@ export default class SmartMentions extends Plugin
 					// Sanitize active notes path
 					let sanitizedLink = this.sanitizeLink(link);
 	
-					if (view?.file.name != sanitizedLink + ".md") // Don't add self to mention block
+					let notFolderNote = true;
+					if (i > 0 && folderNote == link) { notFolderNote = false }
+
+					if (view?.file.name != sanitizedLink + ".md" && notFolderNote) // Don't add self to mention block
 					{
+						totalCharacters += sanitizedLink.length;
+
 						// If mentions bar is too long, then add to overflow menu ...
-						if (totalCharacters > MAX_CHARACTERS)
+						if (totalCharacters > MAX_CHARACTERS && i != 0)
 						{
 							leftOvers = leftOvers.concat(link);
 						}
 						else // ... otherwise, add to mentions bar
 						{
+							if (this.settings.hideFrontUnderScore && sanitizedLink[0] == "_")
+							{
+								sanitizedLink = sanitizedLink.substring(1);
+							}
+
+							// If the note is the folder note, add a "🖿"
+							if (link == folderNote) { sanitizedLink = "🖿 " + sanitizedLink }
 							// If link is the previous note, then add a back arrow
 							// ! The back arrow character (🡨) may not be supported in all operating systems
-							if (link == cameFrom) { sanitizedLink = "🡨 " + sanitizedLink }
+							else if (link == cameFrom) { sanitizedLink = "🡨 " + sanitizedLink }
 
 							// Add link to bar
 							mentions.createEl("a", { text: sanitizedLink, href: this.pathToURL(link), cls: "mention", attr: {"draggable": "false"} });
@@ -195,8 +314,6 @@ export default class SmartMentions extends Plugin
 								mentions.createEl("span", { text: " / ", cls: "mention-space" });
 							}
 						}
-						
-						totalCharacters += sanitizedLink.length;
 					}
 				}
 
@@ -241,6 +358,9 @@ export default class SmartMentions extends Plugin
 
 	async onload()
 	{
+		await this.loadSettings();
+		this.addSettingTab(new SmartMentionsSettingsTab(this.app, this));
+
 		// Execute showLinks whenever a file is opened
 		this.registerEvent(
 		this.app.workspace.on('file-open', () => 
@@ -256,6 +376,14 @@ export default class SmartMentions extends Plugin
 				return this.updateCameFrom();
 			}),
 		);
+	}
+
+	async loadSettings() {
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+	}
+	
+	async saveSettings() {
+		await this.saveData(this.settings);
 	}
 
 	onunload()

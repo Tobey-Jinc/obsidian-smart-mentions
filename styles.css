@@ -1,5 +1,5 @@
 /* @settings
-name: Mentions in Status Bar
+name: Smart Mentions
 id: sm-style
 settings:
     - 
@@ -63,7 +63,7 @@ settings:
 
 /* The main container */
 .mentions {
-    padding: 0px 4px;
+    padding: 2px 5px;
     position: fixed;
     left: 50%;
     bottom:var(--sm-bottom-float);
@@ -171,6 +171,7 @@ settings:
 
 /* The open overflow menu button */
 .overflow-menu-label-button {
+    line-height: 0px; /* Used to prevent it from changing the size of the bar */
     display: inline-block;
     transform: scale(2, 2) translate(-1px, -1.5px);
     transition-duration: 0.2s;
