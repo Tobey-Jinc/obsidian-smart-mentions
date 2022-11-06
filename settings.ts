@@ -67,6 +67,18 @@ export class SmartMentionsSettingsTab extends PluginSettingTab {
                             await this.plugin.saveSettings();
                         })
             );
+
+            new Setting(containerEl)
+            .setName("Recursively Search for Folder Note")
+            .setDesc("If folder note can't be found or the active note is the folder note, then it will try to find a folder note in a parent folder.")
+            .addToggle(toggle => toggle
+                        .setValue(this.plugin.settings.recursiveSearch)
+                        .onChange(async (value) => {
+                            this.plugin.settings.recursiveSearch = value;
+                            await this.plugin.saveSettings();
+                            this.display();
+                        })
+            );
         }
     }
   }

@@ -18,7 +18,7 @@ settings:
         id: sm-background-blur
         title: Background Blur
         type: variable-number
-        default: 5
+        default: 8
         format: px
     -
         id: sm-background-color
@@ -52,7 +52,7 @@ settings:
     /* Numerical variables */
     --sm-font-size: 0.8em;
     --sm-bottom-float: 20px;
-    --sm-background-blur: 5px;
+    --sm-background-blur: 8px;
 
     /* Colour variables */
     --sm-background-color: #1B1B1BC2;
@@ -147,7 +147,7 @@ settings:
 /* Container of the overflow menu items */
 /* Used to stop the backgroun (overflow-menu-background) from scrolling with the items */
 .overflow-menu-item-container {
-    padding: 0px 8px;
+    padding: 2px 8px;
     border-radius: 10px;
     max-height: 200px;
     overflow-y: auto;

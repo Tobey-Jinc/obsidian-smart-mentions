@@ -1,8 +1,10 @@
+import { link } from 'fs';
 import { MarkdownView, Plugin } from 'obsidian';
 import { SmartMentionsSettingsTab } from "./settings";
 
 let mentions: HTMLElement | null = null;	// The div that contains the mentions bar
 let cameFrom: string = "";					// The path of the previous note
+let folderNote: string = "";
 
 const MAX_CHARACTERS: number = 36;			// Max amount of character before mentions are added to overflow menu
 
@@ -17,6 +19,7 @@ interface SmartMentionsSettings
 	useFolderNotes: boolean;			// Does this vault use folder notes / should folder notes attempt to be found
 		minimumNumberOfLinks: number;	// The minimum number of links a note can have for to be considered a potential folder note
 		rootFolderNote: string;			// Since root does have a name, a folder note name must be manually set
+		recursiveSearch: boolean;		// Will search parent folders if a folder note can't be found in the current folder
 }
 
 const DEFAULT_SETTINGS: Partial<SmartMentionsSettings> = {
@@ -24,6 +27,7 @@ const DEFAULT_SETTINGS: Partial<SmartMentionsSettings> = {
 	useFolderNotes: true,
 		minimumNumberOfLinks: 5,
 		rootFolderNote: "_Home",
+		recursiveSearch: true,
 }
 
 export default class SmartMentions extends Plugin
@@ -73,6 +77,8 @@ export default class SmartMentions extends Plugin
 	 */
 	findFolderNote(currFilePath: string)
 	{
+		folderNote = "";
+
 		if (this.settings.useFolderNotes)
 		{
 			// Get all files
@@ -82,8 +88,6 @@ export default class SmartMentions extends Plugin
 
 			// Get the folders of the current note (folder/folder/note.md becomes folder/folder)
 			let currFolderDir = currFilePath.substring(0, currFilePath.lastIndexOf("/"));
-
-			let folderNote = "";
 
 			// Loop through each file
 			Object.keys(allFiles).forEach((key) => {
@@ -119,30 +123,53 @@ export default class SmartMentions extends Plugin
 				fileImportanceList = fileImportanceList.sort((a,b) => b.links - a.links);
 
 				// Check if the first note contains enough links
-				if (Object.values(fileImportanceList[0])[1] >= this.settings.minimumNumberOfLinks)
+				if (fileImportanceList.length > 0)
 				{
-					// * Make sure the first and second file don't have the same amount of links
-					let matched = false;
-					if (fileImportanceList.length > 1)
+					if (Object.values(fileImportanceList[0])[1] >= this.settings.minimumNumberOfLinks)
 					{
-						if (Object.values(fileImportanceList[0])[1] == Object.values(fileImportanceList[1])[1])
+						// * Make sure the first and second file don't have the same amount of links
+						let matched = false;
+						
+						if (fileImportanceList.length > 2)
 						{
-							matched = true; // At this point, no folder note exists
+							if (Object.values(fileImportanceList[0])[1] == Object.values(fileImportanceList[1])[1])
+							{
+								matched = true; // At this point, no folder note exists
+							}
 						}
-					}
-
-					if (!matched)
-					{
-						// Then, Assume the note with the largest number of links is the folder note (or equivalent)
-						folderNote = Object.values(fileImportanceList[0])[0];
+	
+						if (!matched)
+						{
+							// Then, Assume the note with the largest number of links is the folder note (or equivalent)
+							folderNote = Object.values(fileImportanceList[0])[0];
+						}
 					}
 				}
 			}
 
-			return folderNote;
-		}
+			if (this.settings.recursiveSearch)
+			{
+				// * -----------------------------------------------------------------------------
+				// * The following is used to find the folder note in the above folder if a folder
+				// * note can't be found or the active note is the folder note.
 
-		return "";
+				// Get folders
+				let folders = currFilePath.split("/");
+
+				// Check if a valid note was found
+				if ((folderNote == currFilePath || folderNote == "") && folders.length >= 2)
+				{
+					folders.splice(folders.length - 2, 1); // Remove the lowest folder
+					folders.splice(folders.length - 1, 1); // Remove the file name
+					// Add this name instead. Used to make sure a note of the same name isn't found. If one is, god help you :)
+					folders.push("k1s128865adg⇎f12sdk42fjgk↻gas4dfkjg234sdfquytwe8r↨")
+					// * folder/folder/note.md becomes folder/k1s128865adg⇎f12sdk42fjgk↻gas4dfkjg234sdfquytwe8r↨
+					// Run the function again with the parent directory
+					this.findFolderNote(folders.join("/"));
+				}
+				// * -----------------------------------------------------------------------------
+			}
+		}
 	}
 
 	/**
@@ -223,7 +250,7 @@ export default class SmartMentions extends Plugin
 			let linkedMentions = this.getLinkedMentions(view.file.path);
 
 			// Get folder note
-			let folderNote = this.findFolderNote(view.file.path);
+			this.findFolderNote(view.file.path);
 
 			if (folderNote != "")
 			{
@@ -251,6 +278,13 @@ export default class SmartMentions extends Plugin
 					linkedMentions = linkedMentions.concat({path: cameFrom, links: 1});
 				}
 			}
+
+			// * Remove duplicates based on path
+			linkedMentions = linkedMentions.filter((value, index, self) =>
+				index === self.findIndex((name) => (
+					name.path === value.path
+				))
+			);
 
 			// Clear the shown mentions from the previous file if necessary
 			if (mentions != null)
@@ -280,10 +314,10 @@ export default class SmartMentions extends Plugin
 					// Sanitize active notes path
 					let sanitizedLink = this.sanitizeLink(link);
 	
-					let notFolderNote = true;
-					if (i > 0 && folderNote == link) { notFolderNote = false }
+					// let notFolderNote = true;
+					// if (i > 0 && folderNote == link) { notFolderNote = false }
 
-					if (view?.file.name != sanitizedLink + ".md" && notFolderNote) // Don't add self to mention block
+					if (view?.file.path != link) // Don't add self to mention block
 					{
 						totalCharacters += sanitizedLink.length;
 
