@@ -1,5 +1,5 @@
 import { link } from 'fs';
-import { MarkdownView, Plugin } from 'obsidian';
+import { MarkdownView, Plugin, setIcon } from 'obsidian';
 import { SmartMentionsSettingsTab } from "./settings";
 
 let mentions: HTMLElement | null = null;	// The div that contains the mentions bar
@@ -333,14 +333,20 @@ export default class SmartMentions extends Plugin
 								sanitizedLink = sanitizedLink.substring(1);
 							}
 
-							// If the note is the folder note, add a "🖿"
-							if (link == folderNote) { sanitizedLink = "🖿 " + sanitizedLink }
-							// If link is the previous note, then add a back arrow
-							// ! The back arrow character (🡨) may not be supported in all operating systems
-							else if (link == cameFrom) { sanitizedLink = "🡨 " + sanitizedLink }
-
 							// Add link to bar
-							mentions.createEl("a", { text: sanitizedLink, href: this.pathToURL(link), cls: "mention", attr: {"draggable": "false"} });
+							let mention = mentions.createEl("a", { text: sanitizedLink, href: this.pathToURL(link), cls: "mention", attr: {"draggable": "false"} });
+
+							// Add icons if needed
+							if (link == folderNote)
+							{
+								let icon = mention.createEl("span", { cls: "mention-icon", attr: {"draggable": "false"} });
+								setIcon(icon, "git-fork");
+							}
+							else if (link == cameFrom)
+							{
+								let icon = mention.createEl("span", { cls: "mention-icon", attr: {"draggable": "false"} });
+								setIcon(icon, "arrow-left");
+							}
 
 							// Add space if necessary
 							if (i != length - 1 || leftOvers.length > 0)

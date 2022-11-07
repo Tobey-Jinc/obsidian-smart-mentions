@@ -93,6 +93,11 @@ settings:
     color: var(--sm-mention-color);
     padding: 5px;
     transition-duration: 0.3s;
+    /* display: inline-flex;
+    flex-direction: column-reverse;
+    flex-shrink: 0; */
+    display: inline-block;
+    direction: rtl;
 }
 
 /* The space (" / ") between links */
@@ -105,6 +110,13 @@ settings:
 .mention:hover {
     text-decoration: none;
     color: var(--sm-hover-color);
+}
+
+.mention-icon {
+    --icon-size: 1.2em;
+    position: relative;
+    top: 3px;
+    padding-right: 4px;
 }
 
 /* The checkbox that shows / hides the overflow menu */
