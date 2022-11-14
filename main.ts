@@ -340,12 +340,12 @@ export default class SmartMentions extends Plugin
 							if (link == folderNote)
 							{
 								let icon = mention.createEl("span", { cls: "mention-icon", attr: {"draggable": "false"} });
-								setIcon(icon, "git-fork");
+								setIcon(icon, "folder-closed");
 							}
 							else if (link == cameFrom)
 							{
 								let icon = mention.createEl("span", { cls: "mention-icon", attr: {"draggable": "false"} });
-								setIcon(icon, "arrow-left");
+								setIcon(icon, "arrow-left-circle");
 							}
 
 							// Add space if necessary
@@ -379,10 +379,21 @@ export default class SmartMentions extends Plugin
 
 						// If link is the previous note, then add a back arrow
 						// ! The back arrow character (🡨) may not be supported in all operating systems
-						if (leftOvers[i] == cameFrom) { sanitizedLink = "🡨 " + sanitizedLink }
+						// if (leftOvers[i] == cameFrom)
+						// { 
+						// 	let icon = extra_menu_item_container.createEl("span", { cls: "overflow-menu-mention-icon", attr: {"draggable": "false"} });
+						// 	setIcon(icon, "arrow-left-circle");
+						// }
 
 						// Add link to overflow menu
-						extra_menu_item_container.createEl("a", { text: sanitizedLink, href: this.pathToURL(leftOvers[i]), cls: "overflow-menu-item", attr: {"draggable": "false"} });
+						let s = extra_menu_item_container.createSpan();
+						if (leftOvers[i] == cameFrom)
+						{ 
+							let icon = s.createEl("span", { cls: "overflow-menu-mention-icon", attr: {"draggable": "false"} });
+							setIcon(icon, "arrow-left-circle");
+						}
+						let extra_mention = s.createEl("a", { text: sanitizedLink, href: this.pathToURL(leftOvers[i]), cls: "overflow-menu-item", attr: {"draggable": "false"} });
+
 						extra_menu_item_container.createEl("br");
 					};
 				}

@@ -26,7 +26,7 @@ settings:
         type: variable-color
         opacity: true
         format: hex
-        default: '#1B1B1BC2'
+        default: '#1B1B1BDB'
     -
         id: sm-mention-color
         title: Mention Color
@@ -44,7 +44,7 @@ settings:
         title: Space Color
         type: variable-color
         format: hex
-        default: '#4d4d4d'
+        default: '#616161'
 
 */
 
@@ -55,15 +55,15 @@ settings:
     --sm-background-blur: 8px;
 
     /* Colour variables */
-    --sm-background-color: #1B1B1BC2;
+    --sm-background-color: #1B1B1BDB;
     --sm-mention-color: #c0c0c0;
     --sm-hover-color: #ececec;
-    --sm-space-color: #4d4d4d;
+    --sm-space-color: #616161;
 }
 
 /* The main container */
 .mentions {
-    padding: 2px 5px;
+    padding: 0px 7px;
     position: fixed;
     left: 50%;
     bottom:var(--sm-bottom-float);
@@ -113,10 +113,13 @@ settings:
 }
 
 .mention-icon {
-    --icon-size: 1.2em;
+    height: 0px;
+    --icon-size: 14px;
     position: relative;
-    top: 3px;
+    top: 2.5px;
+    margin-bottom: 3px;
     padding-right: 4px;
+    display: inline-block;
 }
 
 /* The checkbox that shows / hides the overflow menu */
@@ -153,16 +156,28 @@ settings:
     background-color: var(--sm-background-color);
     backdrop-filter: blur(var(--sm-background-blur));
     z-index: -1;
-    border-radius: 10px;
+    border-radius: 15px;
 }
 
 /* Container of the overflow menu items */
 /* Used to stop the backgroun (overflow-menu-background) from scrolling with the items */
 .overflow-menu-item-container {
-    padding: 2px 8px;
+    padding: 8px 12px 1px 12px;
     border-radius: 10px;
     max-height: 200px;
+    overflow-x: hidden;
     overflow-y: auto;
+}
+
+.overflow-menu-mention-icon {
+    height: 0px;
+    --icon-size: 14px;
+    position: relative;
+    top: -2px;
+    /* margin-left: 3px; */
+    margin-bottom: 3px;
+    padding-right: 4px;
+    /* display: inline-block; */
 }
 
 /* The items in the overflow menu */
@@ -171,9 +186,11 @@ settings:
     text-decoration: none;
     color: var(--sm-mention-color);
     transition-duration: 0.3s;
-    overflow-wrap: break-word;
+    width: 90%;
     display: inline-block;
-    white-space: normal;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .overflow-menu-item:hover {
