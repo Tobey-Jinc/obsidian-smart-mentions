@@ -208,5 +208,5 @@ settings:
 
 /* Rotate + when open */
 #show-overflow-menu-checkbox:checked ~ .overflow-menu-label-button {
-    transform: rotate(45deg) scale(2, 2) translate(0px, -1px);
+    transform: rotate(45deg) scale(2, 2) translate(-0.5px, -1px);
 }
